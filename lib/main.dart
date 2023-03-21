@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'SQLite database of Films',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -82,10 +83,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemCount: snapshot.data?.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Card(
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(8.0),
-                      title: Text(snapshot.data![index].title),
-                      subtitle: Text(snapshot.data![index].director),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 16.0),
+                            title: Text(snapshot.data![index].title),
+                            subtitle: Text(snapshot.data![index].director),
+                          ),
+                        ),
+                        Container(
+                            padding: const EdgeInsets.only(right: 32),
+                            child: Text(snapshot.data![index].releaseYear.toString())),
+                      ],
                     ),
                   );
                 },
