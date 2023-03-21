@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'database.dart';
+import 'film_model.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -11,12 +14,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'SQLite database of Films',
       theme: ThemeData(
-
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Films'),
     );
   }
 }
@@ -31,11 +33,37 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late DataBase database;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
+  Future<int> addFilms() async {
+    Film film1 = Film(
+        id: 1,
+        title: 'Apocalypse Now',
+        director: 'Francis Ford Coppola',
+        releaseYear: 1979);
+    Film film2 =
+        Film(id: 2, title: 'Heat', director: 'Michael Mann', releaseYear: 1995);
+    Film film3 = Film(
+        id: 3,
+        title: 'The Martian',
+        director: 'Ridley Scott',
+        releaseYear: 2015);
+    Film film4 = Film(
+        id: 4, title: 'Man on Fire', director: 'Tony Scott', releaseYear: 2004);
+    Film film5 = Film(
+        id: 4, title: 'Man on Fire', director: 'Tony Scott', releaseYear: 2004);
+
+    List<Film> films = [film1, film2, film3, film4];
+    return await database.addFilms(films);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    database = DataBase();
+    database.initializeDB().whenComplete(() async {
+      await addFilms();
+      setState(() {});
     });
   }
 
@@ -46,23 +74,27 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        child: FutureBuilder(
+          future: database.getAllFilms(),
+          builder: (BuildContext context, AsyncSnapshot<List<Film>> snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data?.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(8.0),
+                      title: Text(snapshot.data![index].title),
+                      subtitle: Text(snapshot.data![index].director),
+                    ),
+                  );
+                },
+              );
+            } else {
+              return const CircularProgressIndicator();
+            }
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

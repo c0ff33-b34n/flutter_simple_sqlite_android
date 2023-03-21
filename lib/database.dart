@@ -11,7 +11,7 @@ class DataBase {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          "CREATE TABLE films(id INTEGER PRIMARY KEY, title TEXT NOT NULL, director TEXT NOT NULL, releaseYear INTEGER NOT NULL",
+          "CREATE TABLE films(id INTEGER PRIMARY KEY, title TEXT NOT NULL, director TEXT NOT NULL, releaseYear INTEGER NOT NULL)",
         );
       },
     );
